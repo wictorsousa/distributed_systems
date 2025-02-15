@@ -4,7 +4,6 @@ public class Order {
     private String description;
     private double value;
 
-    // Getters, setters e construtor
     public String getDescription() {
         return description;
     }

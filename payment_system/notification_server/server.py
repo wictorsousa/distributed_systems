@@ -3,22 +3,18 @@ import threading
 import grpc
 from concurrent import futures
 
-### gRPC
 import notification_pb2
 import notification_pb2_grpc
 
-### Configurações do Socket
 HOST = 'localhost'
 PORT = 65432
-clients = {}  ### Dicionário para armazenar os sockets dos clientes
+clients = {}  
 
-### Definição do serviço gRPC
 class NotificationService(notification_pb2_grpc.NotificationServiceServicer):
     def SendNotification(self, request, context):
         order_id = request.order_id
         message = request.message
         print(f"gRPC: Recebida notificação para o pedido {order_id}: {message}")
-        ### Envia a notificação para os clientes conectados via socket
         send_socket_message(order_id, message)
         return notification_pb2.NotificationResponse(success=True)
 
@@ -36,20 +32,17 @@ def handle_client(conn, address):
 
     try:
         while True:
-            data = conn.recv(1024)  ### Recebe dados do cliente
+            data = conn.recv(1024) 
             if not data:
                 break
             print(f"Recebido de {address}: {data.decode('utf-8')}")
-            ### TODO: Implementar lógica para associar o cliente a um pedido
 
-            ### conn.sendall(b"Mensagem recebida!")
     except Exception as e:
         print(f"Erro com cliente {address}: {e}")
     finally:
         print(f"Conexão com {address} fechada")
         del clients[address]
         conn.close()
-
 
 def start_socket_server():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -61,15 +54,13 @@ def start_socket_server():
         conn, addr = s.accept()
         threading.Thread(target=handle_client, args=(conn, addr), daemon=True).start()
 
-
 def serve_grpc():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     notification_pb2_grpc.add_NotificationServiceServicer_to_server(NotificationService(), server)
-    server.add_insecure_port('[::]:50051')  ### Porta do gRPC
+    server.add_insecure_port('[::]:50051') 
     server.start()
     print("Servidor gRPC rodando...")
     server.wait_for_termination()
-
 
 if __name__ == "__main__":
     threading.Thread(target=start_socket_server, daemon=True).start()

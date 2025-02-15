@@ -15,8 +15,7 @@ public class PaymentServer extends UnicastRemoteObject implements PaymentService
     public void processPayment(double amount, String orderId) throws RemoteException {
         System.out.println("Recebido pedido de pagamento para o pedido: " + orderId + ", valor: " + amount);
 
-        // Simula o processamento do pagamento (apenas para fins de demonstração)
-        boolean paymentSuccessful = true; // Pode ser aleatório ou baseado em alguma lógica
+        boolean paymentSuccessful = true;
         if (paymentSuccessful) {
             System.out.println("Pagamento aprovado para o pedido: " + orderId);
 
@@ -29,7 +28,7 @@ public class PaymentServer extends UnicastRemoteObject implements PaymentService
     public static void main(String[] args) {
         try {
             PaymentServer server = new PaymentServer();
-            Registry registry = LocateRegistry.createRegistry(1099); // Porta padrão do RMI
+            Registry registry = LocateRegistry.createRegistry(1099); 
             registry.bind("PaymentService", server);
             System.out.println("Servidor de Pagamentos pronto!");
         } catch (Exception e) {

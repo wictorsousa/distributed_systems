@@ -8,8 +8,8 @@ public class GrpcConfig {
 
     public static ManagedChannel getChannel() {
         if (channel == null) {
-            channel = ManagedChannelBuilder.forAddress("localhost", 50051) // Endereço do Servidor de Notificações
-                    .usePlaintext() // Usar apenas em desenvolvimento
+            channel = ManagedChannelBuilder.forAddress("localhost", 50051) 
+                    .usePlaintext() 
                     .build();
         }
         return channel;

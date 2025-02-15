@@ -6,13 +6,12 @@ import requests
 from client.utils import create_order, get_order_status
 
 app = Flask(__name__)
-NOTIFICATION_SERVER_HOST = 'localhost'  ### localhost ou ip do servidor de notificações
+NOTIFICATION_SERVER_HOST = 'localhost'  
 NOTIFICATION_SERVER_PORT = 65432
-ORDER_SERVER_URL = 'http://localhost:8080/orders'  ### url do servidor de pedidos
+ORDER_SERVER_URL = 'http://localhost:8080/orders'  
 
 client_socket = None
-order_id_to_track = None  ### id do pedido que o cliente quer checar
-
+order_id_to_track = None  
 
 def start_socket_listener():
     global client_socket
@@ -29,15 +28,14 @@ def start_socket_listener():
             try:
                 message = client_socket.recv(1024).decode('utf-8')
                 if message:
-                    print(f"Notificação recebida: {message}")  ### Lógica para exibir a notificação para o usuário
+                    print(f"Notificação recebida: {message}")  
                 else:
-                    break  ### Conexão fechada
+                    break  
             except ConnectionResetError:
                 print("Conexão com o servidor de notificações perdida.")
                 break
 
     threading.Thread(target=receive_messages, daemon=True).start()
-
 
 @app.route('/order', methods=['POST'])
 def create_order_route():
@@ -46,14 +44,13 @@ def create_order_route():
         order_id = create_order(order_data)  
         if order_id:
             global order_id_to_track
-            order_id_to_track = order_id ### Guarda o id do pedido criado
+            order_id_to_track = order_id 
             return jsonify({'message': 'Pedido criado com sucesso!', 'order_id': order_id}), 201
         else:
             return jsonify({'message': 'Erro ao criar o pedido.'}), 500
     except Exception as e:
         print(f"Erro ao criar o pedido: {e}")
         return jsonify({'message': 'Erro ao criar o pedido.'}), 500
-
 
 @app.route('/order/<order_id>', methods=['GET'])
 def get_order_status_route(order_id):
@@ -67,7 +64,6 @@ def get_order_status_route(order_id):
         print(f"Erro ao obter o status do pedido: {e}")
         return jsonify({'message': 'Erro ao obter o status do pedido.'}), 500
 
-
 if __name__ == '__main__':
-    start_socket_listener()  ### Inicia a conexão com o servidor de notificações
+    start_socket_listener()  
     app.run(debug=True, port=5000)

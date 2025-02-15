@@ -13,7 +13,7 @@ import java.util.Map;
 @RestController
 public class OrderServerApplication {
 
-    private final Map<String, String> orderStatuses = new HashMap<>(); // Simula um banco de dados
+    private final Map<String, String> orderStatuses = new HashMap<>(); 
     private PaymentService paymentService;
 
     private NotificationServiceGrpc.NotificationServiceBlockingStub notificationStub;
@@ -33,21 +33,18 @@ public class OrderServerApplication {
             e.printStackTrace();
         }
 
-        // Inicializa o cliente gRPC para o servidor de notificações
         this.notificationStub = NotificationServiceGrpc.newBlockingStub(GrpcConfig.getChannel());
-
 
     }
 
     @PostMapping("/orders")
     public String createOrder(@RequestBody Order order) {
-        String orderId = generateOrderId(); // Implementar lógica para gerar ID único
+        String orderId = generateOrderId(); 
         orderStatuses.put(orderId, "Criado");
         System.out.println("Pedido criado: " + order);
 
-        // Chama o servidor de pagamentos via RMI
         try {
-            paymentService.processPayment(order.getValue(), orderId); // Valor do pedido
+            paymentService.processPayment(order.getValue(), orderId); 
             updateOrderStatus(orderId, "Pago");
 
         } catch (Exception e) {
@@ -67,7 +64,6 @@ public class OrderServerApplication {
         orderStatuses.put(orderId, status);
         System.out.println("Status do pedido " + orderId + " atualizado para: " + status);
 
-        // Enviar notificação para o Servidor de Notificações (via gRPC)
         try {
             Notification.NotificationRequest request = Notification.NotificationRequest.newBuilder()
                     .setOrderId(orderId)
